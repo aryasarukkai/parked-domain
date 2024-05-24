@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Coming Soon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Georgia&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-center">
+            <h1 id="domain" class="text-5xl font-bold mb-4"></h1>
+            <h2 class="text-3xl font-bold mb-4">This Project Hasn't Been Created Yet</h2>
+            <p class="text-xl mb-8">Stay tuned for updates on this exciting new project!</p>
+            <p class="text-xl mb-8">In the meantime, check out Arya's GitHub to see his other projects.</p>
+            <a href="https://github.com/aryasarukkai" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-block">
+                Visit Arya's GitHub
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const domainElement = document.getElementById('domain');
+            const currentDomain = window.location.hostname;
+            domainElement.textContent = currentDomain;
+            document.title = currentDomain + ' - Project Coming Soon';
+        });
+    </script>
+</body>
+</html>
