@@ -5,7 +5,7 @@
 
     async function loadContent() {
         try {
-            const response = await fetch('https://imarya.lol/co ntent.txt');
+            const response = await fetch('https://imarya.lol/content.txt');
             const html = await response.text();
             
             // Replace the entire document content
