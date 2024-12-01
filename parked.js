@@ -3,17 +3,43 @@
     if (window.__parkedScriptLoaded) return;
     window.__parkedScriptLoaded = true;
 
+    async function loadTailwind() {
+        return new Promise((resolve) => {
+            const tailwindScript = document.createElement('script');
+            tailwindScript.src = 'https://cdn.tailwindcss.com';
+            tailwindScript.onload = resolve;
+            document.head.appendChild(tailwindScript);
+        });
+    }
+
     async function loadContent() {
         try {
+            // First load Tailwind
+            await loadTailwind();
+
+            // Then fetch the content
             const response = await fetch('https://imarya.lol/content.txt');
             const html = await response.text();
             
-            // Replace the entire document content
+            // Create a temporary container to parse the HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Extract and execute any script configurations first
+            const scripts = doc.getElementsByTagName('script');
+            for (let script of Array.from(scripts)) {
+                if (script.textContent.includes('tailwind.config')) {
+                    eval(script.textContent);
+                    script.remove();
+                }
+            }
+            
+            // Now replace the document content
             document.documentElement.innerHTML = html;
             
-            // Re-execute any scripts that were in the content
-            const scripts = document.getElementsByTagName('script');
-            for (let script of scripts) {
+            // Re-execute remaining scripts in order
+            const remainingScripts = document.getElementsByTagName('script');
+            for (let script of Array.from(remainingScripts)) {
                 const newScript = document.createElement('script');
                 
                 // Copy all attributes
