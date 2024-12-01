@@ -1,32 +1,28 @@
 (function() {
-    // The HTML content as a template string
-    const pageContent = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Domain Parked</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'redhat': ['"Red Hat Display"', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Red Hat Display', sans-serif;
-        }
-        
-        .animated-gradient {
+    // Guard against multiple executions
+    if (window.__parkedScriptLoaded) return;
+    window.__parkedScriptLoaded = true;
+
+    // Create a container for our parked content
+    const parkedContainer = document.createElement('div');
+    parkedContainer.id = 'parked-overlay';
+    parkedContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 999999;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    `;
+
+    // Add required styles
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+        .parked-animated-gradient {
             background: linear-gradient(
                 135deg,
                 #0f172a 0%,
@@ -36,136 +32,130 @@
                 #0f172a 100%
             );
             background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
+            animation: parkedGradient 15s ease infinite;
         }
         
-        @keyframes gradient {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
+        @keyframes parkedGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-    </style>
-</head>
-<body class="text-gray-100 min-h-screen flex items-center justify-center p-4 animated-gradient">
-    <div class="max-w-2xl mx-auto text-center">
-        <div class="mb-8">
-            <svg class="w-24 h-24 mx-auto mb-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" stroke="url(#grad1)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <defs>
-                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#6366f1" />
-                        <stop offset="100%" style="stop-color:#a855f7" />
-                    </linearGradient>
-                </defs>
-            </svg>
-        </div>
-        
-        <div class="relative">
-            <h1 class="relative text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">
-                Domain Parked
-            </h1>
-        </div>
-        
-        <div id="mainContent">
-            <!-- Content will be dynamically inserted here -->
-        </div>
-        
-        <div class="mt-8 bg-gradient-to-r from-gray-800/50 to-gray-900/50 rounded-xl p-8 backdrop-blur-xl border border-gray-700/50">
-            <div id="serverInfo" class="space-y-3">
-                <p class="text-gray-300">
-                    <span class="font-medium bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Domain:</span> 
-                    <span id="domainName" class="ml-2">Loading...</span>
+
+        .parked-content {
+            font-family: 'Red Hat Display', sans-serif;
+            max-width: 32rem;
+            padding: 1rem;
+            color: #f3f4f6;
+            text-align: center;
+            border-radius: 1rem;
+            backdrop-filter: blur(16px);
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .parked-button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            background: linear-gradient(to right, #6366f1, #9333ea);
+            color: white;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .parked-button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .parked-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .parked-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #818cf8, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    `;
+
+    // Add Google Font
+    const fontLink = document.createElement('link');
+    fontLink.rel = 'preconnect';
+    fontLink.href = 'https://fonts.googleapis.com';
+    const fontLink2 = document.createElement('link');
+    fontLink2.rel = 'preconnect';
+    fontLink2.href = 'https://fonts.gstatic.com';
+    fontLink2.crossOrigin = 'anonymous';
+    const fontFamily = document.createElement('link');
+    fontFamily.rel = 'stylesheet';
+    fontFamily.href = 'https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@300;400;500;600;700&display=swap';
+
+    // Create the content
+    parkedContainer.innerHTML = `
+        <div class="parked-content">
+            <h1 class="parked-title">Domain Parked</h1>
+            <div id="parked-main-content">
+                <p style="margin-bottom: 1.5rem; color: #e5e7eb;">
+                    This project is coming soon or has not been provisioned yet.
                 </p>
-                <p class="text-gray-300">
-                    <span class="font-medium bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Server:</span> 
-                    <span id="serverName" class="ml-2">Loading...</span>
+                <a href="https://github.com/aryasarukkai" class="parked-button">
+                    Visit Arya's Github
+                </a>
+            </div>
+            <div class="parked-info">
+                <p style="margin-bottom: 0.5rem; color: #e5e7eb;">
+                    <span style="font-weight: 500;">Domain:</span>
+                    <span id="parked-domain">Loading...</span>
+                </p>
+                <p style="color: #e5e7eb;">
+                    <span style="font-weight: 500;">Server:</span>
+                    <span id="parked-server">Loading...</span>
                 </p>
             </div>
         </div>
-    </div>
+    `;
 
-    <script>
-        async function loadServerInfo() {
-            try {
-                const response = await fetch('https://imarya.lol/servers.txt');
-                const text = await response.text();
-                
-                if (!text.trim()) {
-                    throw new Error('No server data available');
-                }
-                
-                const [domain, serverName] = text.split(':');
-                document.getElementById('domainName').textContent = domain || 'Not Available';
-                
-                const mainContentDiv = document.getElementById('mainContent');
-                
-                if (!serverName || serverName.trim().toLowerCase() === 'unused') {
-                    // Coming soon state
-                    mainContentDiv.innerHTML = \`
-                        <p class="text-xl text-gray-300 mb-6">
-                            This project is coming soon or has not been provisioned yet.
-                        </p>
-                        <a href="https://github.com/aryasarukkai" 
-                           class="inline-block px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium hover:from-indigo-600 hover:to-purple-700 transition-all duration-200">
-                            Visit Arya's Github
-                        </a>
-                    \`;
-                    document.getElementById('serverName').textContent = 'Not Provisioned';
-                } else {
-                    // Active server state
-                    mainContentDiv.innerHTML = \`
-                        <p class="text-xl text-gray-300 mb-6">
-                            This domain is currently parked or has not been provisioned on Arya's server.
-                        </p>
-                    \`;
-                    document.getElementById('serverName').textContent = serverName;
-                }
-                
-            } catch (error) {
-                console.error('Error loading server information:', error);
-                document.getElementById('domainName').textContent = window.location.hostname;
-                document.getElementById('serverName').textContent = 'Not Registered';
-                document.getElementById('mainContent').innerHTML = \`
-                    <p class="text-xl text-gray-300 mb-6">
-                        This project is coming soon or has not been provisioned yet.
-                    </p>
-                    <a href="https://github.com/aryasarukkai" 
-                       class="inline-block px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium hover:from-indigo-600 hover:to-purple-700 transition-all duration-200">
-                        Visit Arya's Github
-                    </a>
-                \`;
-            }
-        }
+    // Add everything to the document
+    document.head.appendChild(styleSheet);
+    document.head.appendChild(fontLink);
+    document.head.appendChild(fontLink2);
+    document.head.appendChild(fontFamily);
+    document.body.appendChild(parkedContainer);
 
-        // Load server information when the page loads
-        document.addEventListener('DOMContentLoaded', loadServerInfo);
-    </script>
-</body>
-</html>`;
-
-    function setPageContent() {
+    // Load server info
+    async function loadServerInfo() {
         try {
-            // Replace the entire HTML content
-            document.documentElement.innerHTML = pageContent;
+            const response = await fetch('https://imarya.lol/servers.txt');
+            const text = await response.text();
             
-            // Initialize server info after content is set
-            if (document.readyState === 'complete' || document.readyState === 'interactive') {
-                loadServerInfo();
-            } else {
-                document.addEventListener('DOMContentLoaded', loadServerInfo);
+            if (!text.trim()) {
+                throw new Error('No server data available');
             }
+            
+            const [domain, serverName] = text.split(':');
+            document.getElementById('parked-domain').textContent = domain || 'Not Available';
+            document.getElementById('parked-server').textContent = 
+                (!serverName || serverName.trim().toLowerCase() === 'unused') 
+                    ? 'Not Provisioned' 
+                    : serverName;
+            
         } catch (error) {
-            console.error('Error setting page content:', error);
-            document.body.innerHTML = '<p>Error loading content. Please try again later.</p>';
+            console.error('Error loading server information:', error);
+            document.getElementById('parked-domain').textContent = window.location.hostname;
+            document.getElementById('parked-server').textContent = 'Not Registered';
         }
     }
 
-    // Set content immediately
-    setPageContent();
+    // Load server info immediately
+    loadServerInfo();
 })();
